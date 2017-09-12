@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>tf_bag</name>
+    <version>0.1.0</version>
+    <description>Utilities to transparently use tf data recorded with rosbag</description>
+
+    <maintainer email="marco.esposito@tum.de">Marco Esposito</maintainer>
+
+    <license>LGPLv3</license>
+
+    <!-- <url type="website">http://wiki.ros.org/tf_bag</url> -->
+
+    <author email="marco.esposito@tum.de">Marco Esposito</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <depend>tf</depend>
+    <depend>rosbag</depend>
+    <depend>std_msgs</depend>
+    <depend>geom_msgs</depend>
+    <depend>numpy</depend>
+
+    <export>
+    </export>
+</package>
