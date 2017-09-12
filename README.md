@@ -81,12 +81,14 @@ average_translation, average_quaternion = bag_transformer.averageTransform(frame
 
  # the transform will be sampled at every update of the transform between frame1 and frame2
 average_translation, average_quaternion = bag_transformer.averageTransform(frame3, frame6,
-                                                                           trigger_orig_frame=frame1_id, trigger_dest_frame=frame2_id)
+                                                                           trigger_orig_frame=frame1_id,
+                                                                           trigger_dest_frame=frame2_id)
 ```
 
 For particular needs, a callback can be provided:
 ```
-translation_z_over_time = bag_transformer.processTransform(lambda time, transform: transform[0][2], frame1_id, frame2_id, start_time)
+translation_z_over_time = bag_transformer.processTransform(lambda time, transform: transform[0][2], 
+                                                           frame1_id, frame2_id, start_time)
 ```
 
 #### Visualization
