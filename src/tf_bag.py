@@ -372,6 +372,7 @@ class BagTfTransformer(object):
         """
         if not transforms:
             raise RuntimeError('requested average of an empty vector of transforms')
+        transforms = list(transforms)
         translations = np.array([t[0] for t in transforms])
         quaternions = np.array([t[1] for t in transforms])
         mean_translation = translations.mean(axis=0).tolist()
