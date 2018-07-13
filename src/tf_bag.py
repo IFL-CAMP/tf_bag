@@ -22,7 +22,7 @@ class BagTfTransformer(object):
         """
         if type(bag) == str:
             bag = rosbag.Bag(bag)
-        self.tf_messages = sorted((tm for m in bag if m.topic == '/tf' for tm in m.message.transforms),
+        self.tf_messages = sorted((tm for m in bag if m.topic.strip("/") == 'tf' for tm in m.message.transforms),
                                   key=lambda tfm: tfm.header.stamp.to_nsec())
         self.tf_times = np.array(list((tfm.header.stamp.to_nsec() for tfm in self.tf_messages)))
         self.transformer = tf.TransformerROS()
