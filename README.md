@@ -27,7 +27,7 @@ was optimized for scripting purposes (e.g. linear scans over time).
 #### Loading data from a bag file
 ```
 import rosbag
-from bag_tf import BagTfTransformer
+from tf_bag import BagTfTransformer
 
 bag_file_path = '/path/to/some.bag'
 
@@ -39,7 +39,7 @@ bag_transformer = BagTfTransformer(bag)
 Or alternatively:
 
 ```
-from bag_tf import BagTfTransformer
+from tf_bag import BagTfTransformer
 
 bag_transformer = BagTfTransformer('/path/to/some.bag')
 ```
