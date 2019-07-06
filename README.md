@@ -25,7 +25,7 @@ was optimized for scripting purposes (e.g. linear scans over time).
 ## Common tasks
 
 #### Loading data from a bag file
-```
+```python
 import rosbag
 from tf_bag import BagTfTransformer
 
@@ -38,19 +38,19 @@ bag_transformer = BagTfTransformer(bag)
 
 Or alternatively:
 
-```
+```python
 from tf_bag import BagTfTransformer
 
 bag_transformer = BagTfTransformer('/path/to/some.bag')
 ```
 
 #### Displaying the transforms included in a bag
-```
+```python
 print(bag_transformer.getTransformGraphInfo())
 ```
 
 #### Looking up a transform
-```
+```python
 translation, quaternion = bag_transformer.lookupTransform(frame1_id, frame2_id, time)
 ```
 
@@ -58,7 +58,7 @@ The transformer takes care of "waiting" for the transform for up to 0.1
 seconds.
 
 #### Waiting for a transform
-```
+```python
 first_transform_time = bag_transformer.waitForTransform(frame1_id, frame2_id, start_time)
 ```
 
@@ -75,7 +75,7 @@ attribute and the target frame as the child_frame_id attribute). If the
 two frames are not directly connected, an alternate "trigger" source or target
 frame (or both) must be specified.
 
-```
+```python
 # the two frames are directly connected in the tf tree
 average_translation, average_quaternion = bag_transformer.averageTransform(frame1_id, frame2_id)
 
@@ -86,7 +86,7 @@ average_translation, average_quaternion = bag_transformer.averageTransform(frame
 ```
 
 For particular needs, a callback can be provided:
-```
+```python
 translation_z_over_time = bag_transformer.processTransform(lambda time, transform: transform[0][2], 
                                                            frame1_id, frame2_id, start_time)
 ```
@@ -95,12 +95,12 @@ translation_z_over_time = bag_transformer.processTransform(lambda time, transfor
 
 The translation of a transform can be visualized in a matplotlib graph.
 If no axis is specified, a 3D plot will be drawn:
-```
+```python
 bag_transformer.plotTranslation(frame1, frame2)
 ```
 
 Otherwise, the value of the translation in one axis will be plotted over time:
-```
+```python
 bag_transformer.plotTranslation(frame1, frame2, axis='z')
 ```
 
