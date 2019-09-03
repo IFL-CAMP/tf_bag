@@ -1,4 +1,3 @@
-
 from __future__ import division
 import copy
 import numpy as np
@@ -14,6 +13,7 @@ class BagTfTransformer(object):
     """
     A transformer which transparently uses data recorded from rosbag on the /tf topic
     """
+
     def __init__(self, bag):
         """
         Create a new BagTfTransformer from an open rosbag or from a file path
@@ -22,13 +22,27 @@ class BagTfTransformer(object):
         """
         if type(bag) == str:
             bag = rosbag.Bag(bag)
-        self.tf_messages = sorted((tm for m in bag if m.topic.strip("/") == 'tf' for tm in m.message.transforms),
-                                  key=lambda tfm: tfm.header.stamp.to_nsec())
+        self.tf_messages = sorted(
+            (self._remove_slash_from_frames(tm) for m in bag if m.topic.strip("/") == 'tf' for tm in
+             m.message.transforms),
+            key=lambda tfm: tfm.header.stamp.to_nsec())
+        self.tf_static_messages = sorted(
+            (self._remove_slash_from_frames(tm) for m in bag if m.topic.strip("/") == 'tf_static' for tm in
+             m.message.transforms),
+            key=lambda tfm: tfm.header.stamp.to_nsec())
+
         self.tf_times = np.array(list((tfm.header.stamp.to_nsec() for tfm in self.tf_messages)))
         self.transformer = tf.TransformerROS()
         self.last_population_range = (rospy.Time(0), rospy.Time(0))
         self.all_frames = None
         self.all_transform_tuples = None
+        self.static_transform_tuples = None
+
+    @staticmethod
+    def _remove_slash_from_frames(msg):
+        msg.header.frame_id = msg.header.frame_id.strip("/")
+        msg.child_frame_id = msg.child_frame_id.strip("/")
+        return msg
 
     def getMessagesInTimeRange(self, min_time=None, max_time=None):
         """
@@ -60,7 +74,8 @@ class BagTfTransformer(object):
         :param target_time: the time at which the Transformer is going to be queried at next
         :param buffer_length: the length of the buffer, in seconds (default: 10, maximum for tf TransformerBuffer)
         """
-        target_start_time = target_time - rospy.Duration(min(buffer_length, 10) - lookahead)  # max buffer length of tf Transformer
+        target_start_time = target_time - rospy.Duration(
+            min(buffer_length, 10) - lookahead)  # max buffer length of tf Transformer
         target_end_time = target_time + rospy.Duration(lookahead)  # lookahead is there for numerical stability
         # otherwise, messages exactly around that time could be discarded
         previous_start_time, previous_end_time = self.last_population_range
@@ -74,6 +89,9 @@ class BagTfTransformer(object):
         tf_messages_in_interval = self.getMessagesInTimeRange(population_start_time, target_end_time)
         for m in tf_messages_in_interval:
             self.transformer.setTransform(m)
+        for st_tfm in self.tf_static_messages:
+            st_tfm.header.stamp = target_time
+            self.transformer.setTransform(st_tfm)
 
         self.last_population_range = (target_start_time, target_end_time)
 
@@ -86,7 +104,7 @@ class BagTfTransformer(object):
         """
         start_time, end_time = self.getStartTime(), self.getEndTime()
         time_range = (end_time - start_time).to_sec()
-        ret = start_time + rospy.Duration(time_range * float(percent/100))
+        ret = start_time + rospy.Duration(time_range * float(percent / 100))
         return ret
 
     def _filterMessages(self, orig_frame=None, dest_frame=None, start_time=None, end_time=None, reverse=False):
@@ -144,7 +162,10 @@ class BagTfTransformer(object):
             ret = set()
             for m in self.tf_messages:
                 ret.add((m.header.frame_id, m.child_frame_id))
+            for m in self.tf_static_messages:
+                ret.add((m.header.frame_id, m.child_frame_id))
             self.all_transform_tuples = ret
+            self.static_transform_tuples = {(m.header.frame_id, m.child_frame_id) for m in self.tf_static_messages}
 
         return self.all_transform_tuples
 
@@ -250,7 +271,7 @@ class BagTfTransformer(object):
             messages = itertools.ifilter(lambda m: m.header.stamp > start_time, self.tf_messages)
         else:
             messages = self.tf_messages
-        missing_transforms = self.getChainTuples(orig_frame, dest_frame)
+        missing_transforms = set(self.getChainTuples(orig_frame, dest_frame)) - self.static_transform_tuples
         message = messages.__iter__()
         ret = rospy.Time(0)
         try:
@@ -426,14 +447,14 @@ class BagTfTransformer(object):
         if end_time is None:
             end_time = self.getEndTime()
         transl, quat = transf
-        time_delta = rospy.Duration(1/frequency)
+        time_delta = rospy.Duration(1 / frequency)
 
         t_msg = TransformStamped(header=Header(frame_id=orig_frame),
-                             child_frame_id=dest_frame,
-                             transform=Transform(translation=Vector3(*transl), rotation=Quaternion(*quat)))
+                                 child_frame_id=dest_frame,
+                                 transform=Transform(translation=Vector3(*transl), rotation=Quaternion(*quat)))
 
         def createMsg(time_nsec):
-            time = rospy.Time(time_nsec/1000000000)
+            time = rospy.Time(time_nsec / 1000000000)
             t_msg2 = copy.deepcopy(t_msg)
             t_msg2.header.stamp = time
             return t_msg2
@@ -487,10 +508,10 @@ class BagTfTransformer(object):
             # 3D
             from mpl_toolkits.mplot3d import Axes3D
             translation_data = np.array(list(self.processTransform(lambda t, tr: (tr[0]),
-                                                     orig_frame=orig_frame, dest_frame=dest_frame,
-                                                     trigger_orig_frame=trigger_orig_frame,
-                                                     trigger_dest_frame=trigger_dest_frame,
-                                                     start_time=start_time, end_time=end_time)))
+                                                                   orig_frame=orig_frame, dest_frame=dest_frame,
+                                                                   trigger_orig_frame=trigger_orig_frame,
+                                                                   trigger_dest_frame=trigger_dest_frame,
+                                                                   start_time=start_time, end_time=end_time)))
             if fig is None:
                 fig = plt.figure()
             if ax is None:
@@ -505,10 +526,10 @@ class BagTfTransformer(object):
             return ax, fig
         else:
             translation_data = np.array(list(self.processTransform(lambda t, tr: (t.to_nsec(), tr[0][axis]),
-                                                              orig_frame=orig_frame, dest_frame=dest_frame,
-                                                              trigger_orig_frame=trigger_orig_frame,
-                                                              trigger_dest_frame=trigger_dest_frame,
-                                                              start_time=start_time, end_time=end_time)))
+                                                                   orig_frame=orig_frame, dest_frame=dest_frame,
+                                                                   trigger_orig_frame=trigger_orig_frame,
+                                                                   trigger_dest_frame=trigger_dest_frame,
+                                                                   start_time=start_time, end_time=end_time)))
             if fig is None:
                 fig = plt.figure()
             if ax is None:
