@@ -4,25 +4,31 @@
 Utilities to transparently use tf data recorded with rosbag
 
 Querying tf for an arbitrary transformation is very comfortable
-at runtime thanks to its tooling (tf_echo from the console and
-the TransformListener programmatically). The programs included in the
+at runtime thanks to its tooling (`tf_echo` from the console and
+the `TransformListener` programmatically). The programs included in the
 tf package implement a background recording of the messages incoming on
-the */tf* topic and assemblying them in a Direct Acyclic Graph, which
+the `/tf` topic and assemblying them in a Direct Acyclic Graph, which
 can then be looked up between two arbitrary nodes.
 
-While it is possible to include the */tf* topic to the ones recorded by
-rosbag, no tool is provided to use this data. So the most common solution
-is to play the rosbag and let a program poll tf regularly. This is not
-an ideal solution, especially for scripting.
+While it is possible to include the `/tf` and `/tf_static` topics to the 
+ones recorded by rosbag, no tool is provided to use this data. So the 
+most common solution is to play the rosbag and let a program poll tf regularly. 
+This is not an ideal solution, especially for scripting.
 
-This package includes a BagTfTransformer which is able to use tf data
-from a recorded rosbag by feeding a tf TransformerROS.
+This package includes a `BagTfTransformer` which is able to use tf data
+from a recorded rosbag by feeding a tf `TransformerROS`.
 It supports looking up a transform at a given time,
 waiting for a transform since a specific time, and much more. The API was
 thought to be as similar as possible as the tf classes. The performance
 was optimized for scripting purposes (e.g. linear scans over time).
 
 ## Common tasks
+
+#### Recording data into a bag file
+```bash
+# save to a custom location, compress on the fly
+rosbag record -O PATH_TO_MY_BAG/data.bag --lz4 /tf /tf_static MY_TOPIC1 MY_TOPIC2 <...>
+```
 
 #### Loading data from a bag file
 ```python
