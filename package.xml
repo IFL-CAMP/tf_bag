@@ -13,11 +13,11 @@
     <author email="esposito@imfusion.com">Marco Esposito</author>
 
     <buildtool_depend>catkin</buildtool_depend>
-    <depend>tf</depend>
-    <depend>rosbag</depend>
-    <depend>std_msgs</depend>
-    <depend>geom_msgs</depend>
-    <depend>numpy</depend>
+    <exec_depend>tf</exec_depend>
+    <exec_depend>rosbag</exec_depend>
+    <exec_depend>std_msgs</exec_depend>
+    <exec_depend>geometry_msgs</exec_depend>
+    <exec_depend>python-numpy</exec_depend>
 
     <export>
     </export>
