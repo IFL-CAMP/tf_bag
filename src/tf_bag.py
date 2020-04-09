@@ -91,7 +91,7 @@ class BagTfTransformer(object):
             self.transformer.setTransform(m)
         for st_tfm in self.tf_static_messages:
             st_tfm.header.stamp = target_time
-            self.transformer.setTransform(st_tfm)
+            self.transformer._buffer.set_transform_static(st_tfm, "default_authority")
 
         self.last_population_range = (target_start_time, target_end_time)
 
