@@ -1,7 +1,12 @@
 from __future__ import division
+try:
+    # Python 2
+    from future_builtins import filter
+except ImportError:
+    # Python 3
+    pass
 import copy
 import numpy as np
-import itertools
 import rosbag
 import rospy
 import tf
@@ -114,13 +119,13 @@ class BagTfTransformer(object):
             messages = self.tf_messages
 
         if orig_frame:
-            messages = itertools.ifilter(lambda m: m.header.frame_id == orig_frame, messages)
+            messages = filter(lambda m: m.header.frame_id == orig_frame, messages)
         if dest_frame:
-            messages = itertools.ifilter(lambda m: m.child_frame_id == dest_frame, messages)
+            messages = filter(lambda m: m.child_frame_id == dest_frame, messages)
         if start_time:
-            messages = itertools.ifilter(lambda m: m.header.stamp > start_time, messages)
+            messages = filter(lambda m: m.header.stamp > start_time, messages)
         if end_time:
-            messages = itertools.ifilter(lambda m: m.header.stamp < end_time, messages)
+            messages = filter(lambda m: m.header.stamp < end_time, messages)
         return messages
 
     def getTransformMessagesWithFrame(self, frame, start_time=None, end_time=None, reverse=False):
@@ -268,7 +273,7 @@ class BagTfTransformer(object):
         if orig_frame == dest_frame:
             return self.tf_messages[0].header.stamp
         if start_time is not None:
-            messages = itertools.ifilter(lambda m: m.header.stamp > start_time, self.tf_messages)
+            messages = filter(lambda m: m.header.stamp > start_time, self.tf_messages)
         else:
             messages = self.tf_messages
         missing_transforms = set(self.getChainTuples(orig_frame, dest_frame)) - self.static_transform_tuples
@@ -293,7 +298,7 @@ class BagTfTransformer(object):
 
         :param orig_frame: the source tf frame of the transform of interest
         :param dest_frame: the target tf frame of the transform of interest
-        :param start_time: the first time at which the messages should be considered; if None, all recorded messages
+        :param time: the first time at which the messages should be considered; if None, all recorded messages
         :return: the ROS time at which the transform is available
         """
         if orig_frame == dest_frame:
@@ -341,10 +346,10 @@ class BagTfTransformer(object):
         :return: a list representing the succession of frames from the tf tree root to the provided one
         """
         frame_chain = [frame]
-        chain_link = filter(lambda tt: tt[1] == frame, self.getTransformFrameTuples())
+        chain_link = list(filter(lambda tt: tt[1] == frame, self.getTransformFrameTuples()))
         while chain_link and frame_chain[-1] != early_stop_frame:
             frame_chain.append(chain_link[0][0])
-            chain_link = filter(lambda tt: tt[1] == frame_chain[-1], self.getTransformFrameTuples())
+            chain_link = list(filter(lambda tt: tt[1] == frame_chain[-1], self.getTransformFrameTuples()))
         return list(reversed(frame_chain))
 
     def getChain(self, orig_frame, dest_frame):
