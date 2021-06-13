@@ -22,6 +22,30 @@ waiting for a transform since a specific time, and much more. The API was
 thought to be as similar as possible as the tf classes. The performance
 was optimized for scripting purposes (e.g. linear scans over time).
 
+## Getting started
+- install ROS, as described in the [official documentation](http://wiki.ros.org/ROS/Installation)
+- install this package into a Catkin workspace
+```bash
+# source the installation workspace (replace <ROSDISTRO> with your distro, e.g. noetic)
+source /opt/ros/<ROSDISTRO>/setup.bash
+# create a catkin workspace
+mkdir -p ~/ros/catkin_ws/src
+# check out this package
+cd ~/ros/catkin_ws/src
+git clone https://github.com/IFL-CAMP/tf_bag.git
+# install the dependencies and compile
+cd ~/ros/catkin_ws
+rosdep install -ryi --from-paths . --ignore-src
+catkin_make # (or catkin build)
+```
+- profit!
+```bash
+# source the workspace, to make the packages available to your shell
+source ~/ros/catkin_ws/devel/setup.bash
+rospython
+>>> import tf_bag
+```
+
 ## Common tasks
 
 #### Recording data into a bag file
