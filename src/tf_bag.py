@@ -80,7 +80,7 @@ class BagTfTransformer(object):
         :param buffer_length: the length of the buffer, in seconds (default: 10, maximum for tf TransformerBuffer)
         """
         target_start_time = target_time - rospy.Duration(
-            min(buffer_length, 10) - lookahead)  # max buffer length of tf Transformer
+            min(min(buffer_length, 10) - lookahead, target_time.to_sec()))  # max buffer length of tf Transformer
         target_end_time = target_time + rospy.Duration(lookahead)  # lookahead is there for numerical stability
         # otherwise, messages exactly around that time could be discarded
         previous_start_time, previous_end_time = self.last_population_range
