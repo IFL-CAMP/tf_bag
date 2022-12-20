@@ -1,0 +1,37 @@
+rosbag2_bagfile_information:
+  compression_format: ''
+  compression_mode: ''
+  custom_data: {}
+  duration:
+    nanoseconds: 10983055479
+  files:
+  - duration:
+      nanoseconds: 10983055479
+    message_count: 112
+    path: rosbagFrankaPandaRos2.bag.db3
+    starting_time:
+      nanoseconds_since_epoch: 1666859837181232895
+  message_count: 112
+  relative_file_paths:
+  - rosbagFrankaPandaRos2.bag.db3
+  starting_time:
+    nanoseconds_since_epoch: 1666859837181232895
+  storage_identifier: sqlite3
+  topics_with_message_count:
+  - message_count: 2
+    topic_metadata:
+      name: /tf_static
+      offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability:
+        1\n  deadline:\n    sec: 2147483647\n    nsec: 4294967295\n  lifespan:\n    sec:
+        2147483647\n    nsec: 4294967295\n  liveliness: 1\n  liveliness_lease_duration:\n
+        \   sec: 2147483647\n    nsec: 4294967295\n  avoid_ros_namespace_conventions:
+        false"
+      serialization_format: cdr
+      type: tf2_msgs/msg/TFMessage
+  - message_count: 110
+    topic_metadata:
+      name: /tf
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: tf2_msgs/msg/TFMessage
+  version: 6
