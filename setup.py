@@ -1,9 +1,10 @@
-from setuptools import setup
-from catkin_pkg.python_setup import generate_distutils_setup
+import setuptools
 
-d = generate_distutils_setup(
-    packages=['tf_bag'],
+
+setuptools.setup(
+    name='tf_bag',
+    version='1.0.0',
+    author='Marco Esposito',
+    packages=setuptools.find_packages(where='src'),
     package_dir={'': 'src'}
 )
-
-setup(**d)
