@@ -288,7 +288,7 @@ class BagTfTransformer(object):
         if time is None:
             time = self.getTimeAtPercent(50)
         self.populateTransformerAtTime(time)
-        return self.transformer.allFramesAsDot()
+        return self.transformer._allFramesAsDot()
 
     def getStartTime(self):
         """
